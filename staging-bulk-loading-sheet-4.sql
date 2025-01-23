@@ -153,3 +153,28 @@ from "SNOWFLAKE"."ACCOUNT_USAGE"."LOAD_HISTORY";
 -- load storage usage of named stages
 select *
 from "SNOWFLAKE"."ACCOUNT_USAGE"."STAGES";
+
+-- Another example of loading data from named stage to a table
+CREATE OR REPLACE TABLE user_profiles (
+    id INT,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100),
+    gender CHAR(1),
+    about_me VARCHAR(255)
+);
+
+create or replace file format user_data_ff
+type = 'csv'
+compression = 'none'
+field_delimiter = ','
+record_delimiter = '\n'
+skip_header = 1
+field_optionally_enclosed_by = '\042'
+escape = '\134';
+
+create or replace stage user_data_stage
+file_format = 'user_data_ff';
+
+copy into user_profiles
+from @user_data_stage/history/user_data.csv;
