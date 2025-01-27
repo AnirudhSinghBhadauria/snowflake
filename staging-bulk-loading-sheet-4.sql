@@ -177,4 +177,23 @@ create or replace stage user_data_stage
 file_format = 'user_data_ff';
 
 copy into user_profiles
-from @user_data_stage/history/user_data.csv;
+from @user_data_stage/history/user_data.csv
+force = True
+purge = True // Deletes the file from stage after file is loaded
+pattern = '.*.csv'
+on_error = continue // loads all the good records. other options - abort_statement, skip_file
+validation_mode = return_all_errors // It will not load any records. it will returns all the errors not only the first one if there are any!,
+;
+
+
+-- LOADING the copy history
+select *
+from table(information_schema.copy_history(
+    table_name => '<name of table>'
+));
+
+-- pipe usage history
+select *
+from table(information_schema.usage_history(
+    pipe_name => '<name of pipe>'
+));
