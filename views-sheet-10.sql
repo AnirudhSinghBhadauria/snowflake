@@ -50,3 +50,36 @@ from global_stream;
 
 select *
 from global_stream;
+
+
+-- creating materialized views,
+create materialized view global_mat_view
+as select person_id, spice_level, health_score, health_impact
+from global;
+
+-- cannot perform,
+
+/*
+
+1. order by
+2. limit
+3. cannot perform any kind of joins
+4. cannot query another materialized view in this
+5. cannot perform dml
+6. cannot truncate it
+
+*/
+
+-- CREATING A SECURE VIEW
+create secure view global_secure_view
+as select person_id, spice_level, health_score, health_impact
+from global;
+
+
+select *
+from global_secure_view;
+
+select get_ddl('table', 'global_secure_view');
+show views like '%secure_view';
+
+-- only a secure view can be shared using data sharing feature of snowflake
