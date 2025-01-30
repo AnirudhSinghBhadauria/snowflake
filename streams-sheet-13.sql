@@ -50,3 +50,59 @@ from global_append_only_stream;
 create external table done(
     name varchar
 );
+
+-- checks if stream has data
+select system$stream_has_data('name of stream');
+
+-- MERGE statement in streams
+
+-- in this way we can update a target table using streams and changes made to the source table...
+
+merge into target_table using source_table_stream
+on target_table.name = source_table_stream.name
+when matched
+    and METADATA$ACTION = 'INSERT'
+    and METADATA$ISUPDATE = 'TRUE'
+then UPDATE
+set target_table.weight = source_table_stream.weight
+--        ... other columns to set
+;   
+
+-- Same action for delete statement
+merge into target table using source_table_stream
+on target_table.name = source_table_stream.name
+when matched
+    and METADATA$ACTION = 'DELETE'
+    and METADATA$ISUPDATE = 'FALSE'
+then DELETE;
+
+
+-- perfoming merge on all the DML operations;
+
+merge into target table using source_table_stream
+on target_table.name = source_table_stream.name
+
+WHEN MATCHED
+    AND source_table_stream.METADATA$ACTION = 'DELETE' 
+    AND source_table_stream.METADATASI SUPDATE = 'FALSE' 
+THEN DELETE
+
+WHEN MATCHED
+AND source_table_stream.METADATA$ACTION = 'INSERT'
+AND source_table_stream.METADATA$ISUPDATE = 'TRUE' I THEN UPDATE
+SET 
+    target.CITY = source_table_stream.CITY, 
+    target.state = source_table_stream.state,
+    target.country= source_table_stream.country
+
+WHEN NOT MATCHED
+AND source_table_stream.METADATASACTION = 'INSERT'
+THEN INSERT
+(NAME, WEIGHT, CITY, STATE, COUNTRY)
+VALUES (
+        source_table_stream.NAME, 
+        source_table_stream.WEIGHT, 
+        source_table_stream.CITY, 
+        source_table_stream.STATE, 
+        source_table_stream.COUNTRY
+);

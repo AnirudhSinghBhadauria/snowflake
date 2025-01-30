@@ -50,3 +50,12 @@ select *
 from game_sales;
 
 list @game_sales_delta;
+
+-- check copy history
+select *
+from table(
+    information_schema.copy_history(
+        TABLE_NAME=>'game_sales', START_TIME => '2025-01-28 09:00:00'::TIMESTAMP
+    )
+)
+;
