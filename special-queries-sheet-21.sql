@@ -19,3 +19,12 @@ from table(
         TABLE_NAME=>'game_sales', START_TIME => '2025-01-28 09:00:00'::TIMESTAMP
     )
 );
+
+/* 
+    Listing out the cluster information of a table.
+    (gives us all the information about our clustering - best function!)
+*/
+select system$clustering_information(
+    'stock_price_data', 
+    '(ticker)'
+);
